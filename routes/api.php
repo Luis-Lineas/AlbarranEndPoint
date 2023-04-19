@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Cliente\ClienteController;
+use App\Http\Controllers\Productos\LlantasController;
+use App\Http\Controllers\Vehiculo\PlacaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +22,25 @@ Route::prefix('auth')->group(function($router) {
     Route::post('nomina/sign-in', [AuthController::class, 'loginWithNomina']);
     Route::post('sign-out', [AuthController::class, 'logout'])->middleware('jwt');
     Route::get('me', [AuthController::class, 'me'])->middleware('jwt');
+});
+
+Route::prefix('placas')->middleware('jwt')->group(function($router) {
+    Route::prefix('v1')->group(function($router){
+        //Route::get('/', [PlacaController::class, 'findByPlaca']);
+        Route::get('/nombre', [PlacaController::class, 'findByPlaca']);
+    });
+});
+
+Route::prefix('clientes')->middleware('jwt')->group(function($router) {
+    Route::prefix('v1')->group(function($router){
+        Route::get('/placa', [ClienteController::class, 'findClienteByPlacaRelated']);
+    });
+});
+
+Route::prefix('productos')->middleware('jwt')->group(function($router) {
+    Route::prefix('v1')->group(function($router){
+        Route::get('/llantas', [LlantasController::class, 'getLlantas']);
+    });
 });
 // //Sucursales
 // Route::prefix('sucursal')->middleware('jwt')->group(function($route){
