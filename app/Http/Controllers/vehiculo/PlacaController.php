@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class PlacaController extends Controller
 {
+    // TODO Hacer busqueda por ID
+    public function findById(int $id)
+    {
+
+    }
+
     public function findByPlaca(Request $request)
     {
         $validator = Validator::make($request->all(), [
