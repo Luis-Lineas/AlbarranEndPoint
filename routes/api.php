@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Cliente\ClienteController;
 use App\Http\Controllers\Productos\LlantasController;
 use App\Http\Controllers\Vehiculo\BitacoraController;
+use App\Http\Controllers\Vehiculo\InspeccionCortesiaController;
 use App\Http\Controllers\Vehiculo\PlacaController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,14 @@ Route::prefix('placas')->middleware('jwt')->group(function($router) {
         Route::get('/nombre', [PlacaController::class, 'findByPlaca']);
     });
 });
+
+Route::prefix('inspeccion-cortesia')->middleware('jwt')->group(function($router) {
+    Route::prefix('v1')->group(function($router){
+        Route::get('/model', [InspeccionCortesiaController::class, 'getModelBD']);
+        Route::post('/save', [InspeccionCortesiaController::class, 'getModelBD']);
+    });
+});
+
 
 Route::prefix('bitacora')->middleware('jwt')->group(function($router) {
     Route::prefix('v1')->group(function($router){
