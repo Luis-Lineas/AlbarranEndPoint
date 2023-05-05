@@ -20,7 +20,7 @@ class LlantasController extends Controller
         ->orderBy('id_producto');
 
         $llantas = DB::table('c_producto')
-        ->select('c_producto.codigo_anterior', 'c_producto.nombre AS producto', 'c_precio.precio', 'c_precio.precio_internet_iva', 'existencia')
+        ->select('c_producto.id','c_producto.codigo_anterior', 'c_producto.nombre AS producto', 'c_precio.precio', 'c_precio.precio_internet_iva', 'existencia')
         ->leftJoin('c_precio', 'c_producto.id', '=', 'c_precio.id_producto')
         ->joinSub($existencias, 't_existencias', 't_existencias.id_producto', '=', 'c_producto.id')
         ->whereIn('id_linea', [5, 8])
