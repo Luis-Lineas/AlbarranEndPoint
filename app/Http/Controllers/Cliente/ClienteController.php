@@ -27,7 +27,8 @@ class ClienteController extends Controller
         ->where('id_placa', $safe['idPlaca'])
         ->where('vivo', true)
         ->whereNotNull('fh_factura')
-        ->orderByDesc('fh_factura');
+        ->orderByDesc('fh_factura')
+        ->take(10);
 
         $orden = DB::table('c_orden')
         ->select('id_cliente')
@@ -36,7 +37,6 @@ class ClienteController extends Controller
         ->whereNotNull('fh_factura')
         ->orderByDesc('fh_factura')
         ->union($ordenAutoexpress)
-        ->take(1)
         ->first();
 
         //no existe orden

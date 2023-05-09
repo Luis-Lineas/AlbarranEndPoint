@@ -11,6 +11,12 @@ class O_Inspeccion extends Model
     use HasFactory;
 
     protected $table = 'o_inspeccion';
+     /**
+     * Indica si el modelo debe mantener los timestamps.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -503,6 +509,19 @@ class O_Inspeccion extends Model
         'corta_ref' => 'boolean',
         'desgas_ref' => 'boolean',
         'ck_final' => 'boolean',
+    ];
+
+    /**
+     * The attributes that should have default values.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'vivo' => true,
+        'ck_final' => false,
+        "nuevo" => true,
+        "modificado" => false,
+        "reply" => false,
     ];
 }
 
