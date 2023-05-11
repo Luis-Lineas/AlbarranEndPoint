@@ -39,6 +39,7 @@ Route::prefix('placas')->middleware('jwt')->group(function($router) {
 //Inspeccion de Cortesia
 Route::prefix('inspeccion-cortesia')->middleware('jwt')->group(function($router) {
     Route::prefix('v1')->group(function($router){
+        Route::get('/orden', [InspeccionCortesiaController::class, 'getOrdenByIdPlaca']);
         Route::get('/model', [InspeccionCortesiaController::class, 'getModelBD']);
         Route::post('/save', [InspeccionCortesiaController::class, 'save']);
     });
@@ -61,7 +62,7 @@ Route::prefix('clientes')->middleware('jwt')->group(function($router) {
 //Productos
 Route::prefix('productos')->middleware('jwt')->group(function($router) {
     Route::prefix('v1')->group(function($router){
-        Route::get('/llantas', [LlantasController::class, 'getLlantas']);
+        Route::get('/llantas', [LlantasController::class, 'getLlantasToAlbarranWeb']);
     });
 });
 

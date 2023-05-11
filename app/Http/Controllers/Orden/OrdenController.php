@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Orden;
 
 use App\Http\Controllers\Controller;
 use App\Utils\HttpCodes;
-use Carbon\Carbon;
+use App\Utils\Traits\CommonTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class OrdenController extends Controller
 {
+
+    use CommonTrait;
 
     public function getAllOrdenes(Request $request)
     {
@@ -91,67 +93,11 @@ class OrdenController extends Controller
         $safe = $validator->validated();
 
         try {
-            dump($this->createNewOrderInDB($safe['idSucursal']));
-            dd();
+            $orden = ($this->createNewOrderInDB($safe['idSucursal']));
+            return response()->json($orden);
         } catch (Exception $e) {
             return response()->json($e->getMessage(), HttpCodes::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private function createNewOrderInDB(int $idSucursal)
-    {
-        try {
-            DB::beginTransaction();
-            $maxOrden = DB::table('c_orden')
-            ->selectRaw('MAX(orden)')
-            ->where('orden', '<', 9000000)
-            ->where('id_sucursal', $idSucursal)
-            ->first();
-
-            $aNumeracionActual = DB::table('a_numeracion')
-            ->select('actual')
-            ->where('vivo', true)
-            ->where('id_numeracion_tipo', 1)
-            ->where('id_sucursal', $idSucursal)
-            ->first();
-
-
-            if($maxOrden->max > $aNumeracionActual->actual) {
-                $actual = $maxOrden->max;
-            } else {
-                $actual = !isset($aNumeracionActual->actual) ? $aNumeracionActual->actual : 1;
-            }
-
-            $actual = $actual + 1;
-
-            $newId = DB::table('c_orden')
-            ->insertGetId([
-                'orden' => $actual,
-                'id_empresa' => Auth::user()->id_empresa,
-                'id_sucursal' => $idSucursal,
-                'id_pago_tipo' => 1,
-                'id_pago' => 1,
-                'fh_inicio' => Carbon::now(),
-                'ck_imprimir_vehiculo' => true
-            ]);
-
-            $orden = DB::table('c_orden')
-            ->where('id', $newId)
-            ->first();
-
-            DB::table('a_numeracion')
-            ->where('vivo', true)
-            ->where('id_numeracion_tipo', 1)
-            ->where('id_sucursal', $idSucursal)
-            ->update([
-                'actual' => $actual
-            ]);
-
-            DB::commit();
-            return response()->json($orden, HttpCodes::HTTP_CREATED);
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
 }
