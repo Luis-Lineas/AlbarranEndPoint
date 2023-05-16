@@ -17,6 +17,43 @@ class InspeccionCortesiaController extends Controller
 {
     use CommonTrait;
 
+
+    public function getInpseccion(Request $request, int $id = null)
+    {
+        $validator = null;
+        if($id == null) {
+            $validator = Validator::make($request->all(), [
+                'orden' => 'required|exists:c_orden,orden',
+                'idSucursal' => 'required|exists:a_sucursal,id_sucursal'
+            ]);
+        } else {
+            $validator = Validator::make(['id' => $id], [
+                'id' => 'required|exists:o_inspeccion,id'
+            ]);
+        }
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), HttpCodes::HTTP_BAD_REQUEST);
+        }
+
+        $oInspeccion = DB::table('o_inspeccion')
+        ->where(function($query) use ($request) {
+            $query->where('orden', $request->input('orden'));
+            $query->where('id_sucursal', $request->input('id_sucursal'));
+        })
+        ->orWhere('id', $id)
+        ->first();
+
+        if($oInspeccion == null) {
+            return response()->json(null, HttpCodes::HTTP_NO_CONTENT);
+        }
+
+        $response = (object) [
+            'oInpseccion' => $oInspeccion
+        ];
+        return response()->json($response);
+    }
+
     public function getOrdenByIdPlaca(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -31,19 +68,24 @@ class InspeccionCortesiaController extends Controller
         $safe = $validator->validated();
 
         $orden = DB::table('c_orden')
-        ->where('vivo', true)
+        ->select('c_orden.id','c_orden.orden', 'o_inspeccion.id AS inspeccion')
+        ->where('c_orden.vivo', true)
         ->where(function($query) use ($safe) {
-            $query->orWhere('id_placa', $safe['idPlaca'])
-            ->orWhereNull('id_placa');
+            $query->orWhere('c_orden.id_placa', $safe['idPlaca'])
+            ->orWhereNull('c_orden.id_placa');
         })
-        ->where('id_sucursal', $safe['idSucursal'])
+        ->where('c_orden.id_sucursal', $safe['idSucursal'])
         ->whereNotIn('id_orden_estado', [2, 6])
+        ->leftJoin('o_inspeccion', function ($query) {
+            $query->on('o_inspeccion.orden', '=', 'c_orden.orden');
+            $query->on('o_inspeccion.id_sucursal', '=', 'c_orden.id_sucursal');
+        })
         ->orderByDesc('fh_inicio')
         ->first();
 
         $statusCode = HttpCodes::HTTP_I_AM_A_TEAPOT;
 
-        if($orden == null) { //Crea una nueva orden
+        if($orden == null || $orden->inspeccion != null) { //Si existe una orden disponible Ó la orden disponible tiene una inspeccion relacionada
             try {
                 $orden = $this->createNewOrderInDB($safe['idSucursal']);
 
