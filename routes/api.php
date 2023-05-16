@@ -8,6 +8,7 @@ use App\Http\Controllers\Productos\LlantasController;
 use App\Http\Controllers\Vehiculo\BitacoraController;
 use App\Http\Controllers\Vehiculo\InspeccionCortesiaController;
 use App\Http\Controllers\Vehiculo\PlacaController;
+use App\Http\Controllers\Web\VentasWebController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,6 +43,8 @@ Route::prefix('inspeccion-cortesia')->middleware('jwt')->group(function($router)
         Route::get('/orden', [InspeccionCortesiaController::class, 'getOrdenByIdPlaca']);
         Route::get('/model', [InspeccionCortesiaController::class, 'getModelBD']);
         Route::post('/save', [InspeccionCortesiaController::class, 'save']);
+        //Rutas con parametros opcionales
+        Route::get('/{id?}', [InspeccionCortesiaController::class, 'getInspeccion']);
     });
 });
 
@@ -84,7 +87,14 @@ Route::prefix('orden-estado')->middleware('jwt')->group(function($router) {
     });
 });
 
-//
+//Ventas por medio de la web
+Route::prefix('ventas-web')->middleware('jwt')->group(function($router) {
+    Route::prefix('v1')->group(function($router){
+        Route::post('/', [VentasWebController::class, 'generarTranspasoAVentasWeb']);
+        //TODO Hacer Crud completo
+        // Route::post('/', [OrdenController::class, 'createNewOrden']); //INFO se hara en futuras referencias
+    });
+});
 
 // //Sucursales
 // Route::prefix('sucursal')->middleware('jwt')->group(function($route){

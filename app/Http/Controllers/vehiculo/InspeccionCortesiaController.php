@@ -18,13 +18,13 @@ class InspeccionCortesiaController extends Controller
     use CommonTrait;
 
 
-    public function getInpseccion(Request $request, int $id = null)
+    public function getInspeccion(Request $request, $id = null)
     {
         $validator = null;
         if($id == null) {
             $validator = Validator::make($request->all(), [
                 'orden' => 'required|exists:c_orden,orden',
-                'idSucursal' => 'required|exists:a_sucursal,id_sucursal'
+                'idSucursal' => 'required|exists:a_sucursal,id'
             ]);
         } else {
             $validator = Validator::make(['id' => $id], [
@@ -36,13 +36,16 @@ class InspeccionCortesiaController extends Controller
             return response()->json($validator->errors(), HttpCodes::HTTP_BAD_REQUEST);
         }
 
-        $oInspeccion = DB::table('o_inspeccion')
-        ->where(function($query) use ($request) {
-            $query->where('orden', $request->input('orden'));
-            $query->where('id_sucursal', $request->input('id_sucursal'));
-        })
-        ->orWhere('id', $id)
-        ->first();
+        if ($id === null) {
+            $oInspeccion = DB::table('o_inspeccion')
+                ->where('orden', $request->input('orden'))
+                ->where('id_sucursal', $request->input('idSucursal'))
+                ->first();
+        } else {
+            $oInspeccion = DB::table('o_inspeccion')
+                ->where('id', $id)
+                ->first();
+        }
 
         if($oInspeccion == null) {
             return response()->json(null, HttpCodes::HTTP_NO_CONTENT);
