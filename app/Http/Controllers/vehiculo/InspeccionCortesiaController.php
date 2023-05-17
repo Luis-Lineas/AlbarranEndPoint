@@ -52,7 +52,7 @@ class InspeccionCortesiaController extends Controller
         }
 
         $response = (object) [
-            'oInpseccion' => $oInspeccion
+            'inspeccionCortesia' => $oInspeccion
         ];
         return response()->json($response);
     }
@@ -88,7 +88,7 @@ class InspeccionCortesiaController extends Controller
 
         $statusCode = HttpCodes::HTTP_I_AM_A_TEAPOT;
 
-        if($orden == null || $orden->inspeccion != null) { //Si existe una orden disponible Ó la orden disponible tiene una inspeccion relacionada
+        if($orden == null) { //Si existe una orden disponible
             try {
                 $orden = $this->createNewOrderInDB($safe['idSucursal']);
 
@@ -134,13 +134,30 @@ class InspeccionCortesiaController extends Controller
     {
         $safe = $request->validated();
         $safe['nomina'] = Auth::user()->nomina;
-        $oInspeccionCortesia = new O_Inspeccion($safe);
+
+        $oInspeccionCortesia = O_Inspeccion::where('orden', $safe['orden'])
+        ->where('id_sucursal', $safe['id_sucursal'])
+        ->where('id_placa', $safe['id_placa'])
+        /*->orWhere(function($query) use ($safe){
+            $query->where('id', $safe['id']);
+        })*/
+        ->first();
+        $httpResponse = HttpCodes::HTTP_I_AM_A_TEAPOT;
+
+        if($oInspeccionCortesia == null) {
+            $oInspeccionCortesia = new O_Inspeccion($safe);
+            $httpResponse = HttpCodes::HTTP_CREATED;
+        } else {
+            $oInspeccionCortesia->fill($safe);
+            $httpResponse = HttpCodes::HTTP_OK;
+        }
+
         // dump($oInspeccionCortesia);
         try {
             DB::beginTransaction();
             $oInspeccionCortesia->save();
             DB::commit();
-            return response()->json($oInspeccionCortesia, HttpCodes::HTTP_CREATED);
+            return response()->json($oInspeccionCortesia, $httpResponse);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json($e->getMessage(), HttpCodes::HTTP_INTERNAL_SERVER_ERROR);
