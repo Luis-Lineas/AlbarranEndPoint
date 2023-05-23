@@ -18,6 +18,12 @@ class InspeccionCortesiaController extends Controller
     use CommonTrait;
 
 
+    /**
+     * Summary of getInspeccion
+     * @param \Illuminate\Http\Request $request
+     * @param mixed $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getInspeccion(Request $request, $id = null)
     {
         $validator = null;
@@ -57,6 +63,11 @@ class InspeccionCortesiaController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Summary of getOrdenByIdPlaca
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getOrdenByIdPlaca(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -130,6 +141,11 @@ class InspeccionCortesiaController extends Controller
         return response()->json($response, $statusCode);
     }
 
+    /**
+     * Summary of save
+     * @param \App\Http\Requests\InspeccionCortesia\OInspeccionRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function save(OInspeccionRequest $request)
     {
         $safe = $request->validated();
@@ -152,7 +168,6 @@ class InspeccionCortesiaController extends Controller
             $httpResponse = HttpCodes::HTTP_OK;
         }
 
-        // dump($oInspeccionCortesia);
         try {
             DB::beginTransaction();
             $oInspeccionCortesia->save();
@@ -164,6 +179,10 @@ class InspeccionCortesiaController extends Controller
         }
     }
 
+    /**
+     * Summary of getModelBD
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getModelBD()
     {
         $inspeccionCortesia = new O_Inspeccion();

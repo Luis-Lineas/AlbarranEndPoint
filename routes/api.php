@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Basic\SucursalController;
 use App\Http\Controllers\Cliente\ClienteController;
 use App\Http\Controllers\Orden\OrdenController;
 use App\Http\Controllers\Orden\OrdenEstadoController;
@@ -90,9 +91,7 @@ Route::prefix('orden-estado')->middleware('jwt')->group(function($router) {
 //Ventas por medio de la web
 Route::prefix('ventas-web')->middleware('jwt')->group(function($router) {
     Route::prefix('v1')->group(function($router){
-        Route::post('/', [VentasWebController::class, 'generarTranspasoAVentasWeb']);
-        //TODO Hacer Crud completo
-        // Route::post('/', [OrdenController::class, 'createNewOrden']); //INFO se hara en futuras referencias
+        Route::post('/venta', [VentasWebController::class, 'generarTranspasoAVentasWeb']);
     });
 });
 
