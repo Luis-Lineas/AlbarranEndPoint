@@ -42,7 +42,7 @@ class BitacoraController extends Controller
         SELECT
             t1.*
             FROM
-            dblink ( 'host=albarran.cfddpggllvms.us-east-1.rds.amazonaws.com user=dbmasteralbarran password=LlGZf9ozYXOyBUZt dbname=Albarran port=1464' :: TEXT,
+            dblink ( 'user=dbmasteralbarran password=LlGZf9ozYXOyBUZt dbname=Albarran port=1464' :: TEXT,
             'SELECT * FROM v_bitacora WHERE id_placa = " .$idPlaca ." ORDER BY fecha DESC;' :: TEXT, FALSE ) t1
             (
                 id_sucursal INTEGER,
