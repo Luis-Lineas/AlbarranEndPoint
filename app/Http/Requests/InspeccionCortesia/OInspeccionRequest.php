@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\InspeccionCortesia;
 
+use App\Utils\HttpCodes;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -36,7 +37,7 @@ class OInspeccionRequest extends FormRequest
             'modificado' => 'nullable|boolean',
             'reply' => 'nullable|boolean',
             'id_placa' => 'required|numeric|exists:c_placa,id',
-            'id_cliente' => 'required|numeric|exists:c_placa,id',
+            'id_cliente' => 'required|numeric|exists:c_cliente,id',
             'afinacion' => 'required|in:0,1,2',
             'filtro_aire' => 'required|in:0,1,2',
             'filtro_gas' => 'required|in:0,1,2',
@@ -62,7 +63,7 @@ class OInspeccionRequest extends FormRequest
             'dire_crema' => 'required|boolean',
             'dire_varillas' => 'required|boolean',
             'dire_termina' => 'required|boolean',
-            'amor_fuga' => 'required|boolean',
+            'amor_fuga' => 'required|boolean', 
             'amor_golpe' => 'required|boolean',
             'amor_spresion' => 'required|boolean',
             'amor_reem' => 'required|boolean',
@@ -282,6 +283,6 @@ class OInspeccionRequest extends FormRequest
             'message' => 'Validation failed',
             'errors' => $errors,
         ];
-        throw new HttpResponseException(response()->json($response, 422));
+        throw new HttpResponseException(response()->json($response, HttpCodes::HTTP_UNPROCESSABLE_ENTITY));
     }
 }
